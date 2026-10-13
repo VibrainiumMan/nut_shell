@@ -6,6 +6,8 @@
 #include <termios.h>
 #include "builtins.h"
 
+History_buf h_buf;
+
 char *builtin_s[] = {
 	"cd",
 	"exit",
@@ -40,6 +42,7 @@ int redirect_file(char **args) {
 				close(f);
 				return -1;
 			}
+			perror("nsh");
 
 			close(f);
 			args[i] = NULL;
@@ -105,11 +108,35 @@ int b_help(char **args) {
 	return 0;
 }
 
+int m_save_cmd(char **args) {
+        if(args == NULL) {
+                return -1;
+        } 
+        
+        char s_cmd[MAX_HIST];
+        snprintf(s_cmd, sizeof(s_cmd), "%s", *args);
+        s_cmd[strcspn(s_cmd, "\n")] = '\0';
+        
+        char *l_cmd = strdup(s_cmd);
+
+        h_buf.history[h_buf.hist_count] = l_cmd; 
+        h_buf.hist_count++;
+	return 1;
+}
+
+void free_hist() {
+	for(int i = 0; i < h_buf.hist_count; i++) {
+                free(h_buf.history[i]);
+                h_buf.history[i] = NULL;
+        }
+        h_buf.hist_count = 0;
+}
+
 int b_history(char **args) {
 	puts("History");
 	if(args[1] == NULL) {
-		for(int i; i < 50; i++) {
-			printf("cmd. %d\n", i);
+		for(int i; i < h_buf.hist_count; i++) {
+                        printf("%s\n", h_buf.history[i]);
 		}
 	}
 	return 1;

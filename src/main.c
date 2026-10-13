@@ -10,15 +10,17 @@
 
 #define USER getenv("USER")
 #define HOST getenv("HOSTNAME")
+#define HOME getenv("HOME")
 
 #define LINE_SIZE 1024
 #define TOK_BUF 64 
-#define DELIM " \" \' \t \r \n" 
+#define DELIM " \t \r \n" 
 
 char *get_cur_dir();
 int s_exec(char **args);
 char **parse(char *input);
 int redirect_file(char **input);
+char trcat_ps1(char *cwd);
 
 int main(void) {
 	//raw_mode();
@@ -40,12 +42,12 @@ int main(void) {
 			break;
 		}
 		if(cbuf == NULL) continue; 
-
+                m_save_cmd(args); 
 		free(args);
 
 	}
 	free(cbuf);
-
+        free_hist(); 
 	return 0;
 }
 
@@ -118,4 +120,9 @@ int exec_builtin(char **args) {
 		}
 	}
 	return s_exec(args);
+}
+
+char trcat_ps1(char *cwd) {
+        char c = cwd;
+        return c;
 }
